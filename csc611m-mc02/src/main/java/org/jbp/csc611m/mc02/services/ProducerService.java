@@ -32,19 +32,18 @@ public class ProducerService {
         // We configure the serializer to describe the format in which we want to produce data into
         // our Kafka cluster
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        //props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.jbp.csc611m.mc02.entities.UrlSerializer");
 
         // Since we need to close our producer, we can use the try-with-resources statement to
         // create
         // a new producer
-        try (Producer<String, String> producer = new KafkaProducer<>(props)) {
+        try (Producer<String, Url> producer = new KafkaProducer<>(props)) {
             for(Url url: urlList) {
                 String key = String.valueOf(url.getId());
 
-                String message = url.getUrl();
-
-                producer.send(new ProducerRecord<String, String>(TOPIC, key, message));
-                System.out.println("sent msg with key " + key +" and message "+message);
+                producer.send(new ProducerRecord<String, Url>(TOPIC, key, url));
+                System.out.println("sent msg with id " + url.getId() +" and url "+url.getUrl());
             }
         } catch (Exception e) {
             System.out.println("Could not start producer: " + e);

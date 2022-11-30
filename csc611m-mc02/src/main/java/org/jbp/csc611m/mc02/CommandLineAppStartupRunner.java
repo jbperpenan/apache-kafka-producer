@@ -6,6 +6,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.jbp.csc611m.mc02.entities.Url;
 import org.jbp.csc611m.mc02.services.ProducerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class CommandLineAppStartupRunner implements CommandLineRunner {
@@ -29,6 +31,9 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
     public void run(String... args){
 
         producerService.produceUrlMessages();
+
+        Thread consumerThread = new Thread(CommandLineAppStartupRunner::consume);
+        consumerThread.start();
 
 /*        Thread consumerThread = new Thread(CommandLineAppStartupRunner::consume);
         consumerThread.start();
@@ -84,16 +89,18 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
         props.setProperty("key.deserializer",
                 "org.apache.kafka.common.serialization.StringDeserializer");
         props.setProperty("value.deserializer",
-                "org.apache.kafka.common.serialization.StringDeserializer");
+                "org.jbp.csc611m.mc02.entities.UrlDeserializer");
         // Every time we consume a message from kafka, we need to "commit" - that is, acknowledge
         // receipts of the messages. We can set up an auto-commit at regular intervals, so that
         // this is taken care of in the background
         props.setProperty("enable.auto.commit", "true");
         props.setProperty("auto.commit.interval.ms", "1000");
 
+        AtomicReference<Url> msgCons = new AtomicReference<>();
+
         // Since we need to close our consumer, we can use the try-with-resources statement to
         // create it
-        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
+        try (KafkaConsumer<String, Url> consumer = new KafkaConsumer<>(props)) {
             // Subscribe this consumer to the same topic that we wrote messages to earlier
             consumer.subscribe(Arrays.asList(TOPIC));
             // run an infinite loop where we consume and print new messages to the topic
@@ -102,10 +109,11 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
                 // subscribed topic
                 // in case there are no messages for the duration specified in the argument (1000 ms
                 // in this case), it returns an empty list
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
-                for (ConsumerRecord<String, String> record : records) {
-                    System.out.printf("received message: %s\n", record.value());
-                }
+                ConsumerRecords<String, Url> records = consumer.poll(Duration.ofMillis(1000));
+                records.forEach(record -> {
+                    msgCons.set(record.value());
+                    System.out.println("Message received " + record.value());
+                });
             }
         }
     }
