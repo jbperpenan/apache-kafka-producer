@@ -41,8 +41,8 @@ public class WebsiteLinksCrawlerService {
 
             List<WebElement> links = driver.findElements(By.tagName("a"));
 
-            for(int i=0;i<links.size();i++)
-            {
+            //for(int i=0;i<links.size();i++) {
+            for(int i=0;i<10;i++) {
                 WebElement E1= links.get(i);
                 String link = E1.getAttribute("href");
                 if(link != null && link.startsWith(websiteUrl)){

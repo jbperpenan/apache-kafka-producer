@@ -6,8 +6,10 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.jbp.csc611m.mc02.services.ProducerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -20,17 +22,18 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
     Logger logger = LoggerFactory.getLogger(CommandLineAppStartupRunner.class);
 
+    @Autowired
+    private ProducerService producerService;
 
     @Override
     public void run(String... args){
-        Thread consumerThread = new Thread(CommandLineAppStartupRunner::consume);
+
+        producerService.produceUrlMessages();
+
+/*        Thread consumerThread = new Thread(CommandLineAppStartupRunner::consume);
         consumerThread.start();
-
         Thread producerThread = new Thread(CommandLineAppStartupRunner::produce);
-        producerThread.start();
-
-        //produce();
-        //consume();
+        producerThread.start();*/
     }
 
     private static final String TOPIC = "my-kafka-topic";
