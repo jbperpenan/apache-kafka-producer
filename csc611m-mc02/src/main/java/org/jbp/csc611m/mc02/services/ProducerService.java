@@ -44,7 +44,7 @@ public class ProducerService {
                 String message = url.getUrl();
 
                 producer.send(new ProducerRecord<String, String>(TOPIC, key, message));
-                System.out.println("sent msg " + key +"with message "+message);
+                System.out.println("sent msg with key " + key +" and message "+message);
             }
         } catch (Exception e) {
             System.out.println("Could not start producer: " + e);
