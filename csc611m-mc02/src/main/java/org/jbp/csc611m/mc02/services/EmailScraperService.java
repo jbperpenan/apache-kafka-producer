@@ -5,6 +5,8 @@ import org.jbp.csc611m.mc02.entities.Url;
 import org.jbp.csc611m.mc02.repositories.EmailRepository;
 import org.jbp.csc611m.mc02.repositories.UrlRepository;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +33,15 @@ public class EmailScraperService {
     @Autowired
     private UrlRepository urlRepository;
 
+    private WebDriver driver;
+
     @Async
-    public CompletableFuture<Set<String>> executeEmailScraping(Url url, WebDriver driver){
+    public CompletableFuture<Set<String>> executeEmailScraping(Url url){
         Set<String> scrapedEmails = new HashSet<>();
+        System.setProperty("webdriver.chrome.driver","src/main/resources/chromedriver");
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        driver = new ChromeDriver(options);
 
         //logger.info("Starting: url = {} with thread {}", url.getUrl(), Thread.currentThread().getName());
         try{
@@ -48,7 +56,7 @@ public class EmailScraperService {
             }
 
             url.setStatus("SCRAPED");
-            url.setWorker(Thread.currentThread().getName());
+            url.setWorker("APP-WORKER-1");
             urlRepository.save(url);
 
             scrapedEmails.stream()
@@ -62,6 +70,8 @@ public class EmailScraperService {
             urlRepository.save(url);
 
             //logger.error("Error scraping email for {}", url.getUrl());
+        } finally {
+            driver.close();
         }
 
         //logger.info("Complete: url = {} with thread {}", url.getUrl(), Thread.currentThread().getName());

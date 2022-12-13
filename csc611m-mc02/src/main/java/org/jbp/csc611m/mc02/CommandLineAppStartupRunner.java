@@ -1,12 +1,12 @@
 package org.jbp.csc611m.mc02;
 
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.jbp.csc611m.mc02.entities.Url;
+import org.jbp.csc611m.mc02.services.ConsumerService;
 import org.jbp.csc611m.mc02.services.ProducerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +30,9 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
     @Autowired
     private ProducerService producerService;
 
+    @Autowired
+    private ConsumerService consumerService;
+
     @Override
     public void run(String... args) throws InterruptedException {
 
@@ -37,8 +40,7 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
 
         Thread.sleep(3000);
 
-        Thread consumerThread = new Thread(CommandLineAppStartupRunner::consume);
-        consumerThread.start();
+        consumerService.runConsumerInstance();
 
 /*        Thread consumerThread = new Thread(CommandLineAppStartupRunner::consume);
         consumerThread.start();

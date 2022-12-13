@@ -56,6 +56,8 @@ public class WebsiteLinksCrawlerService {
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            driver.close();
         }
         //Collections.shuffle(urls);
         return urls;
