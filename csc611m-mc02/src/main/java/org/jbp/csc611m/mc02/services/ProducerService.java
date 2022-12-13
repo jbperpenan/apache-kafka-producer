@@ -42,7 +42,7 @@ public class ProducerService {
             for(Url url: urlList) {
                 String key = String.valueOf(url.getId());
 
-                producer.send(new ProducerRecord<String, Url>(TOPIC, key, url));
+                producer.send(new ProducerRecord<>(TOPIC, key, url));
                 System.out.println("sent msg with id " + url.getId() +" and url "+url.getUrl());
             }
         } catch (Exception e) {
