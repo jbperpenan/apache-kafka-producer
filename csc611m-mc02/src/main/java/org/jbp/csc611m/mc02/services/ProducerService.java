@@ -14,7 +14,7 @@ import java.util.Properties;
 @Service
 public class ProducerService {
 
-    private final String TOPIC = "my-kafka-topic";
+    private final String TOPIC = "my-kafka-topic-1";
     private final String BOOTSTRAP_SERVERS = "localhost:9092";
 
     @Value( "${website}" )
@@ -23,9 +23,9 @@ public class ProducerService {
     @Autowired
     private WebsiteLinksCrawlerService websiteLinksCrawlerService;
 
-    public void produceUrlMessages() {
+    public void produceUrlMessages() throws InterruptedException {
         List<Url> urlList = websiteLinksCrawlerService.initWebsiteCrawlerConfig(website);
-
+        Thread.sleep(10000);
         // Create configuration options for our producer and initialize a new producer
         Properties props = new Properties();
         props.put("bootstrap.servers", BOOTSTRAP_SERVERS);
@@ -42,6 +42,8 @@ public class ProducerService {
             for(Url url: urlList) {
                 String key = String.valueOf(url.getId());
 
+                System.out.println("waiting 5 seconds before sending the next message...");
+                Thread.sleep(5000);
                 producer.send(new ProducerRecord<>(TOPIC, key, url));
                 System.out.println("sent msg with id " + url.getId() +" and url "+url.getUrl());
             }
