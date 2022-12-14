@@ -5,6 +5,8 @@ import com.opencsv.CSVWriter;
 import org.jbp.csc611m.mc02.entities.Email;
 import org.jbp.csc611m.mc02.repositories.EmailRepository;
 import org.jbp.csc611m.mc02.repositories.UrlRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +20,20 @@ import java.util.*;
 @Service
 public class CsvService {
 
+    Logger logger = LoggerFactory.getLogger(CsvService.class);
+
     @Autowired
     private EmailRepository emailRepository;
 
     @Autowired
     private UrlRepository urlRepository;
+
+    public Boolean shouldWriteOutputFilesNow() {
+        Long pending = urlRepository.countLongByStatus("PENDING");
+        logger.info("Cron for writing CSV running, remaining PENDING = " + pending);
+
+        return pending == 0L || pending.equals(0L);
+    }
 
     public List<Long> writeCsvOutputs() throws Exception {
         List<Long> counts = new ArrayList<>();

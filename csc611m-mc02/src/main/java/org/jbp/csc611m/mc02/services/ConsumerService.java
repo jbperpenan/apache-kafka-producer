@@ -14,7 +14,7 @@ import java.util.Properties;
 @Service
 public class ConsumerService {
 
-    private final String TOPIC = "my-kafka-topic";
+    private final String TOPIC = "my-kafka-topic-1";
     private final String BOOTSTRAP_SERVERS = "localhost:9092";
 
     @Autowired

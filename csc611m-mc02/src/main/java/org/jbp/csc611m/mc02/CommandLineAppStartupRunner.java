@@ -2,6 +2,7 @@ package org.jbp.csc611m.mc02;
 
 import org.jbp.csc611m.mc02.services.ConsumerService;
 import org.jbp.csc611m.mc02.services.ProducerService;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -16,9 +17,11 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
     private ConsumerService consumerService;
 
     @Override
-    public void run(String... args) throws InterruptedException {
+    public void run(String... args) throws InterruptedException, SchedulerException {
 
-        Thread.sleep(10000);
+        //Thread.sleep(10000);
         producerService.produceUrlMessages();
+
+        consumerService.runConsumerInstance();
     }
 }
